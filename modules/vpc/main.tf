@@ -127,7 +127,10 @@ resource "aws_subnet" "stride_flow_redis_subnet" {
 # redis route table
 resource "aws_route_table" "stride_flow_redis_route_table" {
   vpc_id = aws_vpc.stride_flow_vpc.id
-  
+  route {
+    cidr_block = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.stride_flow_nat_gateway.id
+  }
   tags = {
     Name = "stride-flow-redis-route-table"
   }

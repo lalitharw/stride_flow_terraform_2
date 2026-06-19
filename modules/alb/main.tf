@@ -1,5 +1,5 @@
 resource "aws_lb" "stride_flow_lb" {
-  name               = "test-lb-tf"
+  name               = "stride-flow-lb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [var.alb-sg-id]

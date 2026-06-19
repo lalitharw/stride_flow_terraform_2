@@ -25,19 +25,21 @@ module "rds" {
   rds_sg_id  = module.sg.rds_sg_id
 }
 
-module "ec2" {
-  source          = "./modules/ec2"
-  backend_sg_id   = module.sg.backend-sg-id
-  private_subnets = module.vpc.private_subnets_id
-}
+# module "ec2" {
+#   source               = "./modules/ec2"
+#   backend_sg_id        = module.sg.backend-sg-id
+#   private_subnets      = module.vpc.private_subnets_id
+#   redis_sg_id          = module.sg.redis-sg-id
+#   redis_private_subnet = module.vpc.redis_private_subnet
+# }
 
-module "alb" {
-  source            = "./modules/alb"
-  alb-sg-id         = module.sg.alb-sg-id
-  public_subnets_id = module.vpc.public_subnets_id
-  vpc_id            = module.vpc.vpc_id
-  instance          = module.ec2.instance
-}
+# module "alb" {
+#   source            = "./modules/alb"
+#   alb-sg-id         = module.sg.alb-sg-id
+#   public_subnets_id = module.vpc.public_subnets_id
+#   vpc_id            = module.vpc.vpc_id
+#   instance          = module.ec2.instance
+# }
 
 ## Status 403 is coming account needs to be verified
 # module "cloudfront" {
