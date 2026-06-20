@@ -1,6 +1,6 @@
-module "s3" {
-  source = "./modules/s3"
-}
+# module "s3" {
+#   source = "./modules/s3"
+# }
 
 module "ecr" {
   source = "./modules/ecr"
@@ -25,21 +25,28 @@ module "rds" {
   rds_sg_id  = module.sg.rds_sg_id
 }
 
-# module "ec2" {
-#   source               = "./modules/ec2"
-#   backend_sg_id        = module.sg.backend-sg-id
-#   private_subnets      = module.vpc.private_subnets_id
-#   redis_sg_id          = module.sg.redis-sg-id
-#   redis_private_subnet = module.vpc.redis_private_subnet
-# }
+module "ec2" {
 
-# module "alb" {
-#   source            = "./modules/alb"
-#   alb-sg-id         = module.sg.alb-sg-id
-#   public_subnets_id = module.vpc.public_subnets_id
-#   vpc_id            = module.vpc.vpc_id
-#   instance          = module.ec2.instance
-# }
+  source               = "./modules/ec2"
+  backend_sg_id        = module.sg.backend-sg-id
+  private_subnets      = module.vpc.private_subnets_id
+  redis_sg_id          = module.sg.redis-sg-id
+  redis_private_subnet = module.vpc.redis_private_subnet
+  iam_instance_profile = module.iam.iam_instance_profile
+}
+
+module "alb" {
+  source            = "./modules/alb"
+  alb-sg-id         = module.sg.alb-sg-id
+  public_subnets_id = module.vpc.public_subnets_id
+  vpc_id            = module.vpc.vpc_id
+  instance          = module.ec2.instance
+}
+
+
+module "iam" {
+  source = "./modules/iam"
+}
 
 ## Status 403 is coming account needs to be verified
 # module "cloudfront" {

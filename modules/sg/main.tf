@@ -36,8 +36,8 @@ resource "aws_security_group" "stride_flow_backend_sg" {
   description = "Port 8080 to be only allowed from active load balancer"
   vpc_id      = var.vpc_id
   ingress {
-    from_port       = 8080
-    to_port         = 8080
+    from_port       = 80
+    to_port         = 80
     protocol        = "tcp"
     security_groups = [aws_security_group.stride_flow_alb_sg.id]
   }

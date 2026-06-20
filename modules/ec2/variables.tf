@@ -14,3 +14,7 @@ variable "redis_sg_id" {
 variable "redis_private_subnet" {
   type = string
 }
+
+variable "iam_instance_profile" {
+  type = string
+}

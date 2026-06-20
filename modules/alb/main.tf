@@ -21,7 +21,7 @@ resource "aws_lb_target_group" "stride_flow_target_group" {
   vpc_id   = var.vpc_id
   health_check {
     enabled             = true
-    path                = "/health"
+    path                = "/up"
     protocol            = "HTTP"
     port                = "traffic-port"
     interval            = 30

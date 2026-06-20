@@ -2,57 +2,80 @@
 
 set -e
 
-sudo apt update -y
-sudo apt upgrade -y
+# Update packages
+apt update -y
 
-sudo apt-get install -y ca-certificates curl
+# Install dependencies
+apt install -y \
+    ca-certificates \
+    curl \
+    unzip
 
-sudo install -m 0755 -d /etc/apt/keyrings
+# Docker repository
+install -m 0755 -d /etc/apt/keyrings
 
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
-  -o /etc/apt/keyrings/docker.asc
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
+    -o /etc/apt/keyrings/docker.asc
 
-sudo chmod a+r /etc/apt/keyrings/docker.asc
+chmod a+r /etc/apt/keyrings/docker.asc
 
 echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] \
   https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" \
+  | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-sudo apt update -y
+apt update -y
 
-sudo apt install -y \
-  docker-ce \
-  docker-ce-cli \
-  containerd.io \
-  docker-buildx-plugin \
-  docker-compose-plugin
+# Install Docker
+apt install -y \
+    docker-ce \
+    docker-ce-cli \
+    containerd.io \
+    docker-buildx-plugin \
+    docker-compose-plugin
 
-sudo systemctl enable docker
-sudo systemctl start docker
+systemctl enable docker
+systemctl start docker
 
-sudo usermod -aG docker ubuntu
+# Install AWS CLI v2
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" \
+    -o "/tmp/awscliv2.zip"
 
-# make folder and write docker compose yaml
+unzip -q /tmp/awscliv2.zip -d /tmp
 
-mkdir stride_flow && cd stride_flow
+/tmp/aws/install
 
-cat > docker-compose.yaml << 'EOF'
+# Login to ECR
+aws ecr get-login-password --region us-east-1 \
+| docker login \
+    --username AWS \
+    --password-stdin 962765735019.dkr.ecr.us-east-1.amazonaws.com
+
+# Create application directory
+mkdir -p /stride_flow
+
+cat > /stride_flow/docker-compose.yaml << 'EOF'
 services:
-    backend:
-        container_name: stride_flow_backend
-        image: 
-        restart: unless-stopped
-        ports:
-            - "8080:8080"
-        
-    caddy:
-        container_name: stride_flow_caddy
-        image:
-        restart: unless-stopped
-        ports:
-            - "80:80"
-        
+  backend:
+    container_name: stride_flow_backend
+    image: 962765735019.dkr.ecr.us-east-1.amazonaws.com/stride_flow_backend_ecr:1f59d6a9a4bbb0256cbb80ad13f26c7a3f81136a
+    restart: unless-stopped
 
+  caddy:
+    container_name: stride_flow_caddy
+    image: 962765735019.dkr.ecr.us-east-1.amazonaws.com/stride_flow_caddy_ecr:1f59d6a9a4bbb0256cbb80ad13f26c7a3f81136a
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - caddy_data:/data
+
+volumes:
+  caddy_data:
 EOF
+
+cd /stride_flow
+
+docker compose pull
+docker compose up -d
