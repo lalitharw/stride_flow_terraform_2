@@ -1,6 +1,6 @@
-# module "s3" {
-#   source = "./modules/s3"
-# }
+module "s3" {
+  source = "./modules/s3"
+}
 
 module "ecr" {
   source = "./modules/ecr"
@@ -14,10 +14,7 @@ module "vpc" {
   redis_subnet    = var.redis_subnet
 }
 
-module "sg" {
-  source = "./modules/sg"
-  vpc_id = module.vpc.vpc_id
-}
+
 
 module "rds" {
   source     = "./modules/rds"
@@ -40,12 +37,26 @@ module "alb" {
   alb-sg-id         = module.sg.alb-sg-id
   public_subnets_id = module.vpc.public_subnets_id
   vpc_id            = module.vpc.vpc_id
-  instance          = module.ec2.instance
+  #   instance          = module.ec2.instance
+}
+
+
+module "asg" {
+  source             = "./modules/asg"
+  target_group_arn   = module.alb.target_group_arn
+  instance_launch_id = module.ec2.instance_launch_id
+  private_subnets    = module.vpc.private_subnets_id
 }
 
 
 module "iam" {
   source = "./modules/iam"
+}
+
+
+module "sg" {
+  source = "./modules/sg"
+  vpc_id = module.vpc.vpc_id
 }
 
 ## Status 403 is coming account needs to be verified

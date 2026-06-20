@@ -33,14 +33,14 @@ resource "aws_lb_target_group" "stride_flow_target_group" {
 }
 
 # target group attachment
-resource "aws_lb_target_group_attachment" "test" {
-  count            = length(var.instance)
-  target_group_arn = aws_lb_target_group.stride_flow_target_group.arn
-  target_id        = var.instance[count.index]
-  port             = 80
+# resource "aws_lb_target_group_attachment" "test" {
+#   count            = length(var.instance)
+#   target_group_arn = aws_lb_target_group.stride_flow_target_group.arn
+#   target_id        = var.instance[count.index]
+#   port             = 80
 
 
-}
+# }
 
 # listener
 resource "aws_lb_listener" "front_end" {

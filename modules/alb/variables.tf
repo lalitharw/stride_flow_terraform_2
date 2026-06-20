@@ -10,6 +10,6 @@ variable "vpc_id" {
   type = string
 }
 
-variable "instance" {
-  type = list(string)
-}
+# variable "instance" {
+#   type = list(string)
+# }
