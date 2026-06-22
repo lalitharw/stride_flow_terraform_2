@@ -71,8 +71,8 @@ DB_HOST=$(echo $SECRET_JSON | jq -r '.DB_HOST')
 DB_DATABASE=$(echo $SECRET_JSON | jq -r '.DB_DATABASE')
 DB_USERNAME=$(echo $SECRET_JSON | jq -r '.DB_USERNAME')
 DB_PASSWORD=$(echo $SECRET_JSON | jq -r '.DB_PASSWORD')
-BACKEND_ECR=$(echo $SECRET_JSON | jq -r '.BACKEND_ECR')
-CADDY_ECR=$(echo $SECRET_JSON | jq -r '.CADDY_ECR')
+BACKEND_IMAGE_TAG=$(echo $SECRET_JSON | jq -r '.BACKEND_IMAGE_TAG')
+CADDY_IMAGE_TAG=$(echo $SECRET_JSON | jq -r '.CADDY_IMAGE_TAG')
 
 # Create application directory
 mkdir -p /stride_flow
@@ -81,7 +81,7 @@ cat > /stride_flow/docker-compose.yaml << EOF
 services:
   backend:
     container_name: stride_flow_backend
-    image: 962765735019.dkr.ecr.us-east-1.amazonaws.com/stride_flow_backend_ecr:latest
+    image: 962765735019.dkr.ecr.us-east-1.amazonaws.com/stride_flow_backend_ecr:${BACKEND_IMAGE_TAG}
     restart: unless-stopped
     environment:
       - APP_NAME=${APP_NAME}
@@ -97,7 +97,7 @@ services:
 
   caddy:
     container_name: stride_flow_caddy
-    image: 962765735019.dkr.ecr.us-east-1.amazonaws.com/stride_flow_caddy_ecr:latest
+    image: 962765735019.dkr.ecr.us-east-1.amazonaws.com/stride_flow_caddy_ecr:${CADDY_IMAGE_TAG}
     restart: unless-stopped
     ports:
       - "80:80"
