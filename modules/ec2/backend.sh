@@ -73,6 +73,8 @@ DB_USERNAME=$(echo $SECRET_JSON | jq -r '.DB_USERNAME')
 DB_PASSWORD=$(echo $SECRET_JSON | jq -r '.DB_PASSWORD')
 BACKEND_IMAGE_TAG=$(echo $SECRET_JSON | jq -r '.BACKEND_IMAGE_TAG')
 CADDY_IMAGE_TAG=$(echo $SECRET_JSON | jq -r '.CADDY_IMAGE_TAG')
+REDIS_HOST=$(echo $SECRET_JSON | jq -r '.REDIS_HOST')
+FRONTEND_URL=$(echo $SECRET_JSON | jq -r '.FRONTEND_URL')
 
 # Create application directory
 mkdir -p /stride_flow
@@ -93,6 +95,7 @@ services:
       - DB_DATABASE=${DB_DATABASE}
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
+      - FRONTEND_URL=${FRONTEND_URL}
       
 
   caddy:
@@ -103,6 +106,27 @@ services:
       - "80:80"
     volumes:
       - caddy_data:/data
+
+  stride_flow_queue:
+    container_name: stride_flow_queue
+    image: 962765735019.dkr.ecr.us-east-1.amazonaws.com/stride_flow_backend_ecr:${BACKEND_IMAGE_TAG}
+    restart: unless-stopped
+    environment:
+      - APP_NAME=${APP_NAME}
+      - APP_KEY=${APP_KEY}
+      - APP_ENV=${APP_ENV}
+      - APP_DEBUG=${APP_DEBUG}
+      - DB_CONNECTION=${DB_CONNECTION}
+      - DB_HOST=${DB_HOST}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_CLIENT=predis
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PASSWORD=null
+      - REDIS_PORT=6379
+      - REDIS_PREFIX=""
+    command: php artisan queue:work --verbose --tries=3 --timeout=90
 
 volumes:
   caddy_data:
