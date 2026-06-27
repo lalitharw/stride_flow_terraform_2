@@ -53,15 +53,15 @@ module "rds" {
 # }
 
 
-# module "iam" {
-#   source = "./modules/iam"
-# }
+module "iam" {
+  source = "./modules/iam"
+}
 
 
-# module "sg" {
-#   source = "./modules/sg"
-#   vpc_id = module.vpc.vpc_id
-# }
+module "sg" {
+  source = "./modules/sg"
+  vpc_id = module.vpc.vpc_id
+}
 
 ## Status 403 is coming account needs to be verified
 # module "cloudfront" {

@@ -38,6 +38,9 @@ apt install -y \
 systemctl enable docker
 systemctl start docker
 
+sudo usermod -aG docker ubuntu
+
+
 # Install AWS CLI v2
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" \
     -o "/tmp/awscliv2.zip"
